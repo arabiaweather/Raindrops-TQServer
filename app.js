@@ -7,7 +7,7 @@ var serverConfigs = config("main");
 console.log(serverConfigs);
 
 var ips = serverConfigs.ips; 
-
+//TODO: notify to send queue lenght as post 
 
 function length(req, res, next)
 {
@@ -145,6 +145,8 @@ server.get('/length', length);
 fq.init(function(){
 	server.listen(serverConfigs.port, function() {
 		console.log('%s listening at %s', server.name, server.url);
+		//Server Start Notify with push
+		notify.notify();
 	});
 });
 
