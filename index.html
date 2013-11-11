@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="TQ-Server : A Transactional Queue Server Built with NodeJS" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>TQ-Server</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/arabiaweather/TQServer">View on GitHub</a>
+
+          <h1 id="project_title">TQ-Server</h1>
+          <h2 id="project_tagline">A Transactional Queue Server Built with NodeJS</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/arabiaweather/TQServer/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/arabiaweather/TQServer/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p><img src="https://raw.github.com/arabiaweather/TQServer/master/logo.png" alt="alt tag"></p>
+
+<h1>
+<a name="tqserver---alpha" class="anchor" href="#tqserver---alpha"><span class="octicon octicon-link"></span></a>TQServer - ALPHA</h1>
+
+<p>Transactional Queue Server Built with NodeJS</p>
+
+<p>The main usecase TQServer taks into consideration is high content integration and also mantaining fast processing of requests.
+By both utilizing the non-Blocking I/O of Nodejs and the Async methods TQServer makes sure to push data fast, serve it fast 
+And still give the client the Transactionl Data Integrity methods to either commit a Pop or Rollit back. </p>
+
+<p>TQServer is very easy to setup and use and does not require hard work to get it up and running, it also has a very small 
+footprint to keep it fast, and not to take up alot of server resources. </p>
+
+<h2>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
+
+<ul>
+<li>Fast response server </li>
+<li>Smart File based, using ASYNC methods and yet keeping content integrity </li>
+<li>Push Notification to a URL when new item added </li>
+<li>REST APIs to do all what you need to do</li>
+<li>Transactional Pop methods to allow Commits and Rollbacks </li>
+</ul><h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>1- Simply just clone the project to the required path</p>
+
+<pre><code>$ git clone git@github.com:arabiaweather/TQServer.git
+</code></pre>
+
+<p>2- Edit the configuration files </p>
+
+<pre><code>Goto ./config/main.json
+{
+    "ips":["127.0.0.1"], // List of IPs that are allowed to use TQServer
+    "port":"8080" // The Port that TQServer will use
+}
+
+Goto ./config/notify.json
+{
+    alowNotify": true, // Allow push notification on Push to Queue to a url or not 
+    "url": "http://www.arabiaweather.com" // URL that will accept the GET call to be notified 
+}
+</code></pre>
+
+<p>3- Use Forever to get it up and running </p>
+
+<pre><code>Goto project root
+$ npm install forever -g
+$ forever start app.js
+</code></pre>
+
+<h2>
+<a name="rest-api" class="anchor" href="#rest-api"><span class="octicon octicon-link"></span></a>REST API</h2>
+
+<h2>
+<a name="1-push-to-queue-server-" class="anchor" href="#1-push-to-queue-server-"><span class="octicon octicon-link"></span></a>1) Push To Queue Server </h2>
+
+<p>Allows you to push a JSON object to the queue, your json object needs to be wrapped in a data object so that it is stored and accessed correctly by TQServer</p>
+
+<pre><code>Method: POST
+URL: http://localhost:8080/push
+Header: Content-Type:application/json
+Payload: {"data":{'YOUR-JSON-DATA'}}
+Response: 201 if create correctly
+          406 if Payload not structured correctly
+</code></pre>
+
+<h2>
+<a name="2-pop-from-queue" class="anchor" href="#2-pop-from-queue"><span class="octicon octicon-link"></span></a>2) Pop From Queue</h2>
+
+<p>Allows you to pop and item from the queue, the body returned will contain your pushed json object without the data wrapper provided in the push. The pop method will be automatically Commited and you will not be able to rollback, for a Transactional Pop use tpop described below. </p>
+
+<pre><code>Method: GET 
+URL: http://localhost/pop
+Response: 200 if popped correctly, 204 if Queue is Empty  
+Response Body: {YOUR-JSON-DATA}
+</code></pre>
+
+<h2>
+<a name="3-transactional-pop" class="anchor" href="#3-transactional-pop"><span class="octicon octicon-link"></span></a>3) Transactional Pop</h2>
+
+<p>Transactional Pop will allow you to pop an item, if you are satisfied with the pop and want it final you can commit it using below REST API Call, or if you want to rollback you can do so using below REST API call. You will need to use the Commit Key to Commit or Rollback. Incase you commit the item pop is final, if you rollback the item will be placed on top of the queue to be processed again. </p>
+
+<pre><code>Method: GET
+URL: http://localhost/tpop
+Response: 200 if popped correctly, 204 if Queue is Empty 
+Response Body: {data:{YOUR-JSON-DATA-HERE}, commitKey:{Key-To-Use-To-Commit-Or-Roleback}}
+</code></pre>
+
+<h2>
+<a name="4-commit-transactional-pop" class="anchor" href="#4-commit-transactional-pop"><span class="octicon octicon-link"></span></a>4) Commit Transactional Pop</h2>
+
+<p>If you use transactional Pop you will can commit final changes using this api call. You will need to commit key to commit changes to that spesific pop. </p>
+
+<pre><code>Method: GET
+URL: http://localhost/commit/{Commit-Key}
+Response: 200 if commited correctly, 400 if key does not exist, 500 if commit was not successful 
+</code></pre>
+
+<h2>
+<a name="5-rollback-transactional-pop" class="anchor" href="#5-rollback-transactional-pop"><span class="octicon octicon-link"></span></a>5) Rollback Transactional Pop</h2>
+
+<p>This will allow you to rollback a Transactional Pop incase you need to get the item back. The item will be placed on top of the queue again for processing. </p>
+
+<pre><code>Method: GET
+URL: http://localhost/rollback/{Commit-Key}
+Response: 200 if rollback was successful, 400 if key does not exist, 500 if rollback failed
+</code></pre>
+
+<h2>
+<a name="6-get-length-of-queue-" class="anchor" href="#6-get-length-of-queue-"><span class="octicon octicon-link"></span></a>6) Get Length Of Queue </h2>
+
+<p>This will allow the client to get the length of the Queue and item count, could be used to do long polling if notificatio is not wanted. </p>
+
+<pre><code>Method: GET 
+URL: http://localhost/length
+Response: 200 if executed correctly 
+Response Body: Integer representing length
+</code></pre>
+
+<h2>
+<a name="todo-list-to-move-to-beta" class="anchor" href="#todo-list-to-move-to-beta"><span class="octicon octicon-link"></span></a>TODO List to Move To BETA</h2>
+
+<ul>
+<li>[ ] Create Test Client and automate testing of server to make sure all methods are correctly implemented and that data integrity is preseved</li>
+<li>[ ] Create rollbackAll REST call to roll back all non-commited tpops</li>
+<li>[ ] Create commitAll REST call to commit all non-commited tpops </li>
+<li>[ ] Creat clearAll Rest call to clear all items in queue and non-commited items</li>
+<li>[ ] Fix notification to be POST and to send length count </li>
+<li>[ ] Clean out code from console logs</li>
+<li>[ ] Create NPM installation package</li>
+</ul><h2>
+<a name="contact-us" class="anchor" href="#contact-us"><span class="octicon octicon-link"></span></a>Contact Us</h2>
+
+<p>Please Visit our github page and contact us there.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">TQ-Server maintained by <a href="https://github.com/arabiaweather">arabiaweather</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
