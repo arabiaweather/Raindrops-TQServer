@@ -1,7 +1,7 @@
 
 var fq = require("./lib/fileQueue.js");
 var restify = require("restify");
-
+var notify = require("./lib/notify.js");
 var config = require('konphyg')('./config');
 var serverConfigs = config("main");
 console.log(serverConfigs);
@@ -9,12 +9,18 @@ console.log(serverConfigs);
 var ips = serverConfigs.ips; 
 
 
+function length()
+{
+	//TODO: Apply to core to get queue lenght for long polling`
+}
+
 function pushQ(req, res, next)
 {
 	if(!(req.params.data === undefined))
 	{	
 		fq.push(req.params.data);
 		res.send(201);
+		notify.notify();
 	}
 	else
 	{
