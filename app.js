@@ -19,6 +19,7 @@ function length(req, res, next)
 
 function pushQ(req, res, next)
 {
+console.log(req.params);
 	if(!(req.params.data === undefined))
 	{	
 		fq.push(req.params.data);
