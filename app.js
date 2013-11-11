@@ -1,70 +1,98 @@
-//Require File Queue 
-var Queue = require('file-queue').Queue;
-//Require resitfy to create REST API interface 
-var restify = require('restify');
-
-//Create Queue Object
-var queue = new Queue('./queue', function(err) {
-	if(err) console.log("Error: Error generating Queue Object");  
-});
-
-queue.clear(function(err) { if (err) throw err; });
-
-//TODO: Save those arrays in a file since if server breaks to be able to continue 
-var commitKeys = {};
-var rollBackKeys = {};
+//TODO: Clean up, create json package, submit to NPM, check error handling on all routes, build automation tester 
+var fq = require("./lib/fileQueue.js");
+var restify = require("restify");
+//TODO: Call fq init before server starts
 function pushQ(req, res, next)
 {
-	//TODO: Check if the req.params.data exists
-	queue.push(req.headers.data, function (err) {
-		if(err) throw err; //TODO: Throw over REST
+	if(!(req.params.data === undefined))
+	{	
+		fq.push(req.params.data);
 		res.send(201);
-	});
-
+	}
+	else
+	{
+		res.send(406,"Data Json Object must be spesified");
+	}
 	return next;
 }
 
 function popQ(req, res, next)
 {
-//TODO: Count and if 0 then do not push to avoid hangs 
-	queue.pop(function(err, message) {
-		if (err) throw err; //TODO: Throw over REST 
-		res.send(message);
-	});
-	return next;
+	//TODO:create non-transactional pop in lib
 }
 
 function tPopQ(req, res, next)
 {
-	queue.tpop(function(err, message, commit, rollback) 
-	{
-		var newCommitKey = new Date().getTime() + 'a'; 
-		commitKeys[newCommitKey] = commit;
-		rollBackKeys[newCommitKey] = rollback;
-		res.send({commitKey:newCommitKey, data:message}); //TODO: Set Header 200
+	fq.tpop(function(data){
+		if(data == null)
+		{
+			res.send(204);
+		}
+		else
+		{
+			res.send(200,data);
+		}
 	});
 	return next;
 }
 
 function commitKey(req, res, next)
 {
-	commitKeys[req.params.key](function(err){if(err) throw err;});
-	res.send(202);
-	//TODO: Remove Key here 
-	return next;
+	fq.commit(req.params.key, function(err){
+		if(err == false)
+		{
+			res.send(200);
+		}
+		else if (err = -1)
+		{
+			res.send(404,"Key Not Found");
+		}
+		else
+		{
+			res.send(500, "Key was not commited, error occured, " + err.toString());
+		}
+	});
+return next;
 }
 
 function rollBack(req, res, next)
 {
-	rollBackKeys[req.params.key](function(err){if(err) throw err;})
-	res.send(202);
-	//TODO: Remove Key Here 
-	return next;
+	fq.rollback(req.params.key, function(err){
+		if(err == false)
+                {
+                        res.send(200);
+                }
+                else if (err = -1)
+                {
+                        res.send(404,"Key Not Found");
+                }
+                else
+                {
+                        res.send(500, "Key was not commited, error occured, " + err.toString());
+                }
+
+	});	
 }
 
+function rollBackAll(req, res, next)
+{
+	//TODO: In Lib
+}
 
-//Restify Server Setup with routes 
+function commitAll(req, res, next)
+{
+	//TODO: in Lib
+}
+
+function clearAll(req, res, next)
+{
+	//TODO: Implement from Lib
+}
+
 var server = restify.createServer();
+
+server.use(restify.bodyParser())
+//TODO: Set server specs (jsonp + ip restrictions + etc....)
 server.post('/push', pushQ);
 server.get('/pop', popQ);
 server.get('/tpop', tPopQ);
