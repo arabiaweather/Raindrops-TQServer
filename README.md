@@ -89,4 +89,23 @@ This will allow you to rollback a Transactional Pop incase you need to get the i
     Method: GET
     URL: http://localhost/rollback/{Commit-Key}
     Response: 200 if rollback was successful, 400 if key does not exist, 500 if rollback failed
-    
+
+6) Get Length Of Queue 
+------
+
+This will allow the client to get the length of the Queue and item count, could be used to do long polling if notificatio is not wanted. 
+
+    Method: GET 
+    URL: http://localhost/length
+    Response: 200 if executed correctly 
+    Response Body: Integer representing length
+
+
+TODO List 
+---
+
+- [ ] Create Test Client and automate testing of server to make sure all methods are correctly implemented and that data integrity is preseved
+- [ ] Create rollbackAll REST call to roll back all non-commited tpops
+- [ ] Create commitAll REST call to commit all non-commited tpops 
+- [ ] Creat clearAll Rest call to clear all items in queue and non-commited items
+- [ ] Fix notification to be POST and to send length count 
