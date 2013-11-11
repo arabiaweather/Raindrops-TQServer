@@ -1,3 +1,12 @@
+var sys = require('sys');
+var asciimo = require('asciimo').Figlet;
+var colors = require('colors'); // add colors for fun
+
+var font = 'Colossal';
+var welcome = "TQ-Server";
+asciimo.write(welcome,font,function(art){
+	sys.puts(art.green);
+});
 
 var fq = require("./lib/fileQueue.js");
 var restify = require("restify");
@@ -145,7 +154,7 @@ server.get('/rollback/:key', rollBack);
 server.get('/length', length);
 fq.init(function(){
 	server.listen(serverConfigs.port, function() {
-		console.log('%s listening at %s', server.name, server.url);
+		console.log('%s listening at %s', "TQ-SERVER", server.url);
 		//Server Start Notify with push
 		notify.notify();
 	});
