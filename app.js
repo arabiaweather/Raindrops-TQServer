@@ -9,9 +9,12 @@ console.log(serverConfigs);
 var ips = serverConfigs.ips; 
 
 
-function length()
+function length(req, res, next)
 {
-	//TODO: Apply to core to get queue lenght for long polling`
+	fq.length(function(len){
+		res.send(200,len);
+	});
+	return next;
 }
 
 function pushQ(req, res, next)
@@ -138,6 +141,7 @@ server.get('/pop', popQ);
 server.get('/tpop', tPopQ);
 server.get('/commit/:key',commitKey);
 server.get('/rollback/:key', rollBack);
+server.get('/length', length);
 fq.init(function(){
 	server.listen(serverConfigs.port, function() {
 		console.log('%s listening at %s', server.name, server.url);
