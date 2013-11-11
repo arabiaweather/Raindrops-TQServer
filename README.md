@@ -118,4 +118,5 @@ TODO List
 - [ ] Create commitAll REST call to commit all non-commited tpops 
 - [ ] Creat clearAll Rest call to clear all items in queue and non-commited items
 - [ ] Fix notification to be POST and to send length count 
-- [] Clean out code from console logs
+- [ ] Clean out code from console logs
+- [ ] Create NPM installation package
