@@ -1,7 +1,14 @@
-//TODO: Clean up, create json package, submit to NPM, check error handling on all routes, build automation tester 
+
 var fq = require("./lib/fileQueue.js");
 var restify = require("restify");
-//TODO: Call fq init before server starts
+
+var config = require('konphyg')('./config');
+var serverConfigs = config("main");
+console.log(serverConfigs);
+
+var ips = serverConfigs.ips; 
+
+
 function pushQ(req, res, next)
 {
 	if(!(req.params.data === undefined))
@@ -18,7 +25,19 @@ function pushQ(req, res, next)
 
 function popQ(req, res, next)
 {
-	//TODO:create non-transactional pop in lib
+
+
+	fq.pop(function(data){
+                if(data == null)
+                {
+                        res.send(204);
+                }
+                else
+                {
+                        res.send(200,data);
+                }
+        });
+        return next;
 }
 
 function tPopQ(req, res, next)
@@ -76,28 +95,48 @@ function rollBack(req, res, next)
 
 function rollBackAll(req, res, next)
 {
-	//TODO: In Lib
+	//TODO: Implementation needed In Lib
 }
 
 function commitAll(req, res, next)
 {
-	//TODO: in Lib
+	//TODO: Implementation needed in Lib
 }
 
 function clearAll(req, res, next)
 {
-	//TODO: Implement from Lib
+	//TODO: Implement from Lib, already there, needs to be executed and blocks all requests until done
 }
 
 var server = restify.createServer();
 
 server.use(restify.bodyParser())
-//TODO: Set server specs (jsonp + ip restrictions + etc....)
+
+
+//Block ips that are not allowed
+server.pre(function(req, res, next) {
+	if((ips.indexOf(req.connection.remoteAddress)) == -1)
+	{
+		res.send(403,"Remote Address not allowed");
+
+	}
+	return next();
+});
+
+
+server.use(restify.jsonp());
+server.use(restify.gzipResponse());
+
 server.post('/push', pushQ);
 server.get('/pop', popQ);
 server.get('/tpop', tPopQ);
 server.get('/commit/:key',commitKey);
 server.get('/rollback/:key', rollBack);
-server.listen(8080, function() {
-  console.log('%s listening at %s', server.name, server.url);
+fq.init(function(){
+	server.listen(serverConfigs.port, function() {
+		console.log('%s listening at %s', server.name, server.url);
+	});
 });
+
+
+
