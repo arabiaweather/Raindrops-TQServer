@@ -10,6 +10,13 @@ And still give the client the Transactionl Data Integrity methods to either comm
 TQServer is very easy to setup and use and does not require hard work to get it up and running, it also has a very small 
 footprint to keep it fast, and not to take up alot of server resources. 
 
+Features 
+- Fast response server 
+- Smart File based, using ASYNC methods and yet keeping content integrity 
+- Push Notification to a URL when new item added 
+- REST APIs to do all what you need to do
+- Transactional Pop methods to allow Commits and Rollbacks 
+
 Installation
 ---
 
