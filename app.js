@@ -127,7 +127,19 @@ function commitAll(req, res, next)
 
 function clearAll(req, res, next)
 {
-	//TODO: Implement from Lib, already there, needs to be executed and blocks all requests until done
+	blockops.block();
+	fq.clearAll(function(resp){
+		if(resp) 
+			{
+				blockops.unBlock(function(resp){
+					if(resp)
+					{
+						res.send(200,"Cleared All Data, Server is unblocked");
+					}
+				});
+			}	
+	});
+	return next;	
 }
 
 var server = restify.createServer();
@@ -159,12 +171,14 @@ server.get('/tpop', tPopQ);
 server.get('/commit/:key',commitKey);
 server.get('/rollback/:key', rollBack);
 server.get('/length', length);
+server.get('/clearAll',clearAll);
+
 fq.init(function(){
 	server.listen(serverConfigs.port, function() {
 		console.log('%s listening at %s', "TQ-SERVER", server.url);
 		//Server Start Notify with push
 		notify.notify();
-		blockops.unBlockRequests();
+		blockops.unBlock(function(resp){});
 	});
 });
 
