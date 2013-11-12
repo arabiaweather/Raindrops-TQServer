@@ -2,6 +2,7 @@ var sys = require('sys');
 var asciimo = require('asciimo').Figlet;
 var colors = require('colors'); // add colors for fun
 
+
 var font = 'Colossal';
 var welcome = "TQ-Server";
 asciimo.write(welcome,font,function(art){
@@ -13,6 +14,8 @@ var restify = require("restify");
 var notify = require("./lib/notify.js");
 var config = require('konphyg')('./config');
 var serverConfigs = config("main");
+var blockops = require('./lib/blockops.js');
+
 console.log(serverConfigs);
 
 var ips = serverConfigs.ips; 
@@ -132,12 +135,16 @@ var server = restify.createServer();
 server.use(restify.bodyParser())
 
 
-//Block ips that are not allowed
+//Block ips that are not allowed, also make sure requests not blocked from clear,commit and rollback all
 server.pre(function(req, res, next) {
 	if((ips.indexOf(req.connection.remoteAddress)) == -1)
 	{
 		res.send(403,"Remote Address not allowed");
 
+	}
+	if (blockops.isBlocked())
+	{
+		res.send(503,"Server currently Blocked for a Transactional Process");
 	}
 	return next();
 });
@@ -157,6 +164,7 @@ fq.init(function(){
 		console.log('%s listening at %s', "TQ-SERVER", server.url);
 		//Server Start Notify with push
 		notify.notify();
+		blockops.unBlockRequests();
 	});
 });
 
