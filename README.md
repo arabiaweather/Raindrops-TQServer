@@ -119,6 +119,7 @@ TODO List
 - [ ] Create rollbackAll REST call to roll back all non-commited tpops
 - [ ] Create commitAll REST call to commit all non-commited tpops 
 - [ ] Creat clearAll Rest call to clear all items in queue and non-commited items
-- [ ] Fix notification to be POST and to send length count 
+- [x] Fix notification to GET and to send length count, it appends /{count} to notification url. 
 - [ ] Clean out code from console logs
 - [ ] Create NPM installation package
+- [ ] Create Logger for Errors and certian interactions 
