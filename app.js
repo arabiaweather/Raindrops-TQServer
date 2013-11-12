@@ -142,6 +142,20 @@ function clearAll(req, res, next)
 	return next;	
 }
 
+
+function commitAll(req, res, next){
+	blockops.block();
+	fq.commitAll(function(resp){
+		if(resp)
+		{
+
+			blockops.unBlock(function(resp){
+				res.send(200,"All Items Commited, Block removed from server");
+			});
+		}
+	});
+};
+
 var server = restify.createServer();
 
 server.use(restify.bodyParser())
@@ -172,7 +186,7 @@ server.get('/commit/:key',commitKey);
 server.get('/rollback/:key', rollBack);
 server.get('/length', length);
 server.get('/clearAll',clearAll);
-
+server.get('/commitAll', commitAll);
 fq.init(function(){
 	server.listen(serverConfigs.port, function() {
 		console.log('%s listening at %s', "TQ-SERVER", server.url);
