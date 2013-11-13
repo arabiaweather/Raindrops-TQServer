@@ -2,9 +2,8 @@ var sys = require('sys');
 var asciimo = require('asciimo').Figlet;
 var colors = require('colors'); // add colors for fun
 
-
-var font = 'Colossal';
-var welcome = "TQ-Server";
+var font = 'Thin';
+var welcome = "Raindrops Server";
 asciimo.write(welcome,font,function(art){
 	sys.puts(art.green);
 });
@@ -16,10 +15,8 @@ var config = require('konphyg')('./config');
 var serverConfigs = config("main");
 var blockops = require('./lib/blockops.js');
 
-console.log(serverConfigs);
 
 var ips = serverConfigs.ips; 
-
 
 function length(req, res, next)
 {
@@ -31,7 +28,6 @@ function length(req, res, next)
 
 function pushQ(req, res, next)
 {
-console.log(req.params);
 	if(!(req.params.data === undefined))
 	{	
 		fq.push(req.params.data);
@@ -154,8 +150,7 @@ function rollbackAll(req, res, next)
 		if(err) 
 		{
 			blockops.unBlock();
-			console.log("err");
-			throw err;
+			send.res(500,"Can not rollback, error has occured");
 		}
 		else
 		{
@@ -176,9 +171,8 @@ function rollbackAll(req, res, next)
 var server = restify.createServer();
 
 server.use(restify.bodyParser())
+server.use(restify.jsonp());
 
-
-//Block ips that are not allowed, also make sure requests not blocked from clear,commit and rollback all
 server.pre(function(req, res, next) {
 	if((ips.indexOf(req.connection.remoteAddress)) == -1)
 	{
@@ -207,7 +201,7 @@ server.get('/commitAll', commitAll);
 server.get('/rollbackAll', rollbackAll);
 fq.init(function(){
 	server.listen(serverConfigs.port, function() {
-		console.log('%s listening at %s', "TQ-SERVER", server.url);
+		console.log('%s listening at %s', "Raindrops Server", server.url);
 		//Server Start Notify with push
 		notify.notify();
 		blockops.unBlock(function(resp){});
