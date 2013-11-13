@@ -1,5 +1,5 @@
 {
-  "name": "Raindrops",
+  "name": "raindrops",
   "version": "1.0.0",
   "description": "A Transactional Queue Server with REST API Access, built for Speed and Data integrity ",
   "main": "app.js",
