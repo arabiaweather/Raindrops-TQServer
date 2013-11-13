@@ -1,0 +1,34 @@
+{
+  "name": "Raindrops",
+  "version": "1.0.0",
+  "description": "A Transactional Queue Server with REST API Access, built for Speed and Data integrity ",
+  "main": "app.js",
+  "dependencies": {
+    "asciimo": "~0.3.1",
+    "colors": "~0.6.2",
+    "async": "~0.2.9",
+    "konphyg": "~1.2.1",
+    "restify": "~2.6.0",
+    "request": "~2.27.0",
+    "rimraf": "~2.2.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/arabiaweather/TQServer.git"
+  },
+  "keywords": [
+    "transactional",
+    "transaction",
+    "queue",
+    "server"
+  ],
+  "author": "Arabiaweather, Yousef wadi",
+  "license": "CC BY-NC",
+  "bugs": {
+    "url": "https://github.com/arabiaweather/TQServer/issues"
+  }
+}
