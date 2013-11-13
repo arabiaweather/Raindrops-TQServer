@@ -1,6 +1,6 @@
 ![alt tag](https://raw.github.com/arabiaweather/TQServer/master/logo.png)
 
-TQServer - ALPHA
+Raindrops TQServer - 1.0 Beta
 ========
 
 Transactional Queue Server Built with NodeJS
@@ -112,14 +112,42 @@ This will allow the client to get the length of the Queue and item count, could 
     Response Body: Integer representing length
 
 
-TODO List 
----
+7) Rollback All 
+------
 
-- [ ] Create Test Client and automate testing of server to make sure all methods are correctly implemented and that data integrity is preseved
-- [ ] Create rollbackAll REST call to roll back all non-commited tpops
-- [ ] Create commitAll REST call to commit all non-commited tpops 
-- [x] Creat clearAll Rest call to clear all items in queue and non-commited items
-- [x] Fix notification to GET and to send length count, it appends /{count} to notification url. 
-- [ ] Clean out code from console logs
-- [ ] Create NPM installation package
-- [ ] Create Logger for Errors and certian interactions 
+This will block all server requests until completed to perserve content integrity, this should be used carefully when needed in very severe times. 
+It allows you to rollback all Transactional pops that have not been commited. 
+
+    Method: GET 
+    URL: http://localhost/rollbackAll
+    Response: 200 if executed correctly, 500 if error occurs 
+    Response Body: String of execution message 
+
+8) Commit All 
+------
+
+This will block all server requests until completed to preserve content integrity, this should be used crefully when needed in very severe times. 
+It allows you to commit all Transactional Pops that have not been committed yet. 
+
+    Method: GET 
+    URL: http://localhost/commitAll
+    Response: 200 if executed correctly, 500 if error occurs 
+    Response Body: String of execution message 
+
+9) Clear All 
+------
+
+This will block all server requests until completed to perserve content integrity, this should be used carefully when needed in very severe times.
+This will delete the queue complety and non commited items, everything will be removed. 
+
+    Method: GET
+    URL: http://localhost/commitAll
+    Response: 200 if executed correctly, 500 if error occurs 
+    Response Body: String of execution message
+
+Features and Enhancements ahead 
+------
+- [ ] Not block completly when commitAll, rollbackAll, clearAll are called. Allow it to take time to respond. Could be made as a config option. 
+
+
+
