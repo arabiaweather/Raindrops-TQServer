@@ -27,6 +27,13 @@ Installation
 1- Simply just clone the project to the required path
 
     $ git clone git@github.com:arabiaweather/TQServer.git
+    $ node app.js
+    ---
+    OR
+    ---
+    $ npm install raindrops 
+    - Navigate to nodemodules/raindrops
+    $node app.js
 
 2- Edit the configuration files 
 
