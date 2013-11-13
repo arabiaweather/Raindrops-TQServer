@@ -19,7 +19,7 @@ var blockops = require('./lib/blockops.js');
 console.log(serverConfigs);
 
 var ips = serverConfigs.ips; 
-//TODO: notify to send queue lenght as post 
+
 
 function length(req, res, next)
 {
@@ -115,16 +115,6 @@ function rollBack(req, res, next)
 	});	
 }
 
-function rollBackAll(req, res, next)
-{
-	//TODO: Implementation needed In Lib
-}
-
-function commitAll(req, res, next)
-{
-	//TODO: Implementation needed in Lib
-}
-
 function clearAll(req, res, next)
 {
 	blockops.block();
@@ -156,6 +146,33 @@ function commitAll(req, res, next){
 	});
 };
 
+function rollbackAll(req, res, next)
+{
+	blockops.block();
+	fq.rollbackAll(function(err){
+
+		if(err) 
+		{
+			blockops.unBlock();
+			console.log("err");
+			throw err;
+		}
+		else
+		{
+			blockops.unBlock(function(resp){
+				if(resp){
+						res.send(200,"All Items rolledback, Block on reuests removed");
+					}
+				else
+					{
+						res.send(500, "An Error has occured");
+					}
+			});
+		}
+	})
+	return next;
+}
+
 var server = restify.createServer();
 
 server.use(restify.bodyParser())
@@ -170,7 +187,7 @@ server.pre(function(req, res, next) {
 	}
 	if (blockops.isBlocked())
 	{
-		res.send(503,"Server currently Blocked for a Transactional Process");
+		res.send(500,"Server currently Blocked for a Transactional Process");
 	}
 	return next();
 });
@@ -187,6 +204,7 @@ server.get('/rollback/:key', rollBack);
 server.get('/length', length);
 server.get('/clearAll',clearAll);
 server.get('/commitAll', commitAll);
+server.get('/rollbackAll', rollbackAll);
 fq.init(function(){
 	server.listen(serverConfigs.port, function() {
 		console.log('%s listening at %s', "TQ-SERVER", server.url);
